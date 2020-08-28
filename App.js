@@ -1,21 +1,51 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {useState} from 'react';
+import { StyleSheet, View, Button, FlatList, SafeAreaView } from 'react-native';
+import GoalInput from "./components/GoalInput";
+import GoalItem from "./components/GoalItem";
+
 
 export default function App() {
+  const [goals, setGoals] = useState([])
+  const [visible, setVisible] = useState(false)
+
+  const onAdd = (goalText) => {
+    if(goalText.length === 0){
+      return;
+    }
+    setGoals([...goals, {id: Math.random().toString(), text: goalText}])
+    setVisible(false)
+  }
+
+  const onDelete = (id) => {
+    const newGoals = goals.filter(goal => goal.id !== id)
+    setGoals(newGoals)
+  }
+
+  const onCancel = () => {
+    setVisible(false)
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+      <SafeAreaView style={{flex: 1}}>
+      <View style={{padding: 50}}>
+        <Button title="Add new goal" onPress={() => setVisible(true)}/>
+        <GoalInput onAdd={onAdd} visible={visible} onCancel={onCancel}/>
+        <View style={{marginTop: 20}}>
+          <FlatList
+              data={goals}
+              renderItem={itemData => (
+                 <GoalItem item={itemData.item} onDelete={onDelete}/>
+                )
+              }
+              keyExractor={(item, index) => item.id}
+          />
+        </View>
+      </View>
+      </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+
+
 });
